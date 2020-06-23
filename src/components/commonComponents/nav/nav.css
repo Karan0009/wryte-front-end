@@ -1,0 +1,10 @@
+.btn_profile,
+.btn_write {
+  margin: 0 5px;
+}
+
+.nav-search-btn {
+  position: relative;
+  right: 24px;
+  color: black;
+}

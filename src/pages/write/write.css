@@ -1,0 +1,40 @@
+.writeForm_div {
+  width: 50% !important;
+  margin: 20px 0 0 0;
+}
+
+option:selected {
+  color: red !important;
+}
+
+.write-tags {
+  padding: 25px !important;
+  height: 150px !important;
+}
+
+.tags {
+  display: grid;
+  grid-template-rows: auto auto;
+}
+
+.tag {
+  display: flex;
+  flex-direction: row;
+  border: 3px solid #0000ff30;
+
+  margin-top: 5px;
+  padding: 5px;
+  border-radius: 0.2rem;
+  box-sizing: border-box;
+  align-items: center;
+}
+
+.tag p {
+  color: #0000ff80;
+  flex: 10;
+  margin: 0px;
+}
+
+.tag span {
+  color: #ff000080;
+}

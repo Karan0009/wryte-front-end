@@ -1,0 +1,14 @@
+.chat_form input {
+  border: 2px solid #92c7ff98;
+  border-radius: none;
+}
+
+.chat_box {
+  -moz-box-shadow: -15px 0px 35px -11px #92c7ff98;
+  box-shadow: -15px 0px 35px -11px #92c7ff98;
+}
+
+/* .chat_box {
+  -moz-box-shadow: 0px 0px 42px 1px rgba(146, 199, 255, 1);
+  box-shadow: 0px 0px 42px 1px rgba(146, 199, 255, 1);
+} */

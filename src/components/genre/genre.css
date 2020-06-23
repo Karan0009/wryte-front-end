@@ -1,0 +1,32 @@
+.genre_div {
+  flex: 1;
+  /* border: 2px solid #343a40; */
+  border-radius: 0.25rem;
+  background: #343a40;
+  vertical-align: middle;
+  padding: 20px;
+  text-align: center;
+  margin: 0px 10px 0px 10px;
+  border: 3px solid #ffffff00;
+  box-shadow: 0px 2px 9px 0px #4d4c4c8a;
+  color: white;
+}
+
+.genre_div_active {
+  border: 3px solid yellow;
+  color: yellow !important;
+}
+
+.genre_text {
+  color: inherit;
+  text-align: center;
+  vertical-align: middle;
+  margin: 0px;
+  font-size: 1.5rem;
+  text-transform: capitalize;
+  padding: 0px;
+}
+
+a:hover {
+  text-decoration: none !important;
+}

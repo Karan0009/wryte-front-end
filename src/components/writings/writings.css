@@ -1,0 +1,7 @@
+.writings_div {
+  display: flex;
+  flex-flow: wrap;
+  width: 90%;
+  margin: auto;
+  justify-content: center;
+}
