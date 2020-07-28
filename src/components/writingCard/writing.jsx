@@ -135,9 +135,7 @@ class Writing extends Component {
               ].join(" ")}
               aria-hidden="true"
               onClick={this.writingLikeHandler}
-            >
-              like
-            </i>
+            ></i>
             <p>{this.state.likeCount}</p>
           </span>
           <span className="comment_button_info">
@@ -146,9 +144,7 @@ class Writing extends Component {
                 className="fa fa-comment-o"
                 aria-hidden="true"
                 // onClick={this.writingCommentHandler}
-              >
-                comment
-              </i>
+              ></i>
             </Button>
 
             <p>{this.props.writing.comments.length}</p>
@@ -158,9 +154,7 @@ class Writing extends Component {
               className="fa fa-paper-plane-o"
               aria-hidden="true"
               onClick={this.writingShareHandler}
-            >
-              share
-            </i>
+            ></i>
             {this.state.linkCopied && <p>copied!</p>}
           </span>
         </section>

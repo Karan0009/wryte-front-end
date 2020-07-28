@@ -296,9 +296,7 @@ class SingleWritingPage extends Component {
                   ].join(" ")}
                   aria-hidden="true"
                   onClick={this.writingLikeHandler}
-                >
-                  like
-                </i>
+                ></i>
                 <p>{this.state.likeCount}</p>
               </span>
               <span className="share_button_info">
@@ -306,9 +304,7 @@ class SingleWritingPage extends Component {
                   className="fa fa-paper-plane-o"
                   aria-hidden="true"
                   onClick={this.writingShareHandler}
-                >
-                  share
-                </i>
+                ></i>
                 {this.state.linkCopied && <p>copied!</p>}
               </span>
             </section>

@@ -47,9 +47,7 @@ const Comment = (props) => {
             className="writing_comment_delete"
             onClick={() => props.deleteCommentHandler(props.data._id)}
           >
-            <i className="fa fa-trash" aria-hidden="true">
-              delete
-            </i>
+            <i className="fa fa-trash" aria-hidden="true"></i>
           </div>
         )}
       </div>
