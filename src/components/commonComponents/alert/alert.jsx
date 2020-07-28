@@ -1,10 +1,12 @@
-import React, { Fragment, useEffect } from "react";
+import React, { Fragment } from "react";
 
 const alert = (props) => {
+  let classes = "alert alert-dismissible fade show alert-warning";
+  if (props.error) classes = "alert alert-dismissible fade show alert-danger";
   return (
     <Fragment>
       <div
-        className="alert alert-warning alert-dismissible fade show"
+        className={classes}
         role="alert"
         style={{
           width: "50%",

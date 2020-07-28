@@ -7,6 +7,7 @@
   flex-flow: column;
   word-wrap: break-word;
   width: 30%;
+  min-width: 20rem;
   max-width: 20rem;
   position: relative;
 }
@@ -22,6 +23,8 @@
 
 .read-more-btn {
   margin-bottom: 15px;
+  position: relative;
+  bottom: 0px;
 }
 
 .author-info {
@@ -49,9 +52,38 @@
 }
 
 .author-info p {
-  font-size: 20px;
+  font-size: 15px;
   margin: auto 5px;
-  color: ;
+  color: #6c757d;
+}
+
+.writing_buttons {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  grid-template-rows: 50px;
+  justify-items: center;
+  align-items: stretch;
+  margin: auto;
+}
+
+.writing_buttons span {
+  margin: 0 5px;
+  color: #6c757d;
+}
+
+.writing_buttons span i {
+  cursor: pointer;
+  color: #6c757d;
+}
+
+.writing_buttons span .comment_btn,
+.writing_buttons span .comment_btn:hover,
+.writing_buttons span .comment_btn:active {
+  border: none;
+  background: none;
+  box-sizing: border-box;
+  outline: 0;
+  padding: 0px;
 }
 
 @media only screen and (max-width: 1200px) {

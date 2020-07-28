@@ -135,3 +135,7 @@
 .button--raised.button--success:active {
   background: #00a151;
 }
+
+.button_loading {
+  cursor: not-allowed;
+}

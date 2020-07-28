@@ -7,11 +7,6 @@ option:selected {
   color: red !important;
 }
 
-.write-tags {
-  padding: 25px !important;
-  height: 150px !important;
-}
-
 .tags {
   display: grid;
   grid-template-rows: auto auto;

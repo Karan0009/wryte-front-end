@@ -1,0 +1,75 @@
+.writing_comment_box {
+  display: grid;
+  border: 1px solid #0000004f;
+  background: white;
+  grid-template-columns: auto 40px 40px;
+  margin-top: 10px;
+  border-radius: 0.25rem;
+  word-wrap: break-word;
+  align-items: stretch;
+}
+
+.writing_comment_data {
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: 40px auto;
+}
+
+.writing_comment_userdata {
+  display: grid;
+  grid-template-columns: 50px auto;
+  align-items: center;
+}
+
+.writing_comment_userdata .writing_comment_authorimage {
+  margin-left: 10px;
+}
+
+.writing_comment_userdata p {
+  margin: auto 0;
+}
+
+.writing_comment_content {
+  word-wrap: break-word;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 100%;
+  margin-left: 15px;
+}
+
+.writing_comment_interaction {
+  display: grid;
+  grid-template-rows: auto auto;
+  grid-template-columns: auto;
+  justify-items: center;
+}
+
+.writing_comment_like i,
+.writing_comment_reply i {
+  cursor: pointer;
+}
+
+.writing_comment_delete {
+  display: grid;
+  grid-template-rows: auto;
+  cursor: pointer;
+  align-items: center;
+  justify-items: center;
+  background: #ff3737;
+}
+
+.writing_comment_form {
+  display: grid;
+  margin-top: 20px;
+  grid-template-rows: 50px;
+  grid-template-columns: auto 150px;
+  grid-template-rows: auto;
+  align-items: start;
+}
+.writing_comment_form .btn {
+  margin-left: 20px;
+}
+
+.comment_replies_box {
+  margin-left: 20px;
+}

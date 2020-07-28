@@ -1,11 +1,13 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 
 import { required, length, email, checkMimeType } from "../../utils/validators";
 
 import "./signup.css";
 
 import Input from "../../components/commonComponents/input/input";
+import Image from "../../components/commonComponents/image/image";
+import Textarea from "../../components/commonComponents/textarea/textarea";
 import Button from "../../components/commonComponents/Button/Button";
 
 class SignupPage extends Component {
@@ -13,45 +15,47 @@ class SignupPage extends Component {
     super(props);
     this.state = {
       errors: [],
+      profilePicturePreviewUrl: "https://via.placeholder.com/150",
       signupForm: {
-        firstName: {
-          value: "",
-          valid: false,
-          touched: false,
+        name: {
+          value: "asdfsadf",
+          valid: true,
+          touched: true,
           validators: [required, length({ min: 2 })],
         },
-        lastName: {
-          value: "",
-          valid: false,
-          touched: false,
-          validators: [required, length({ min: 2 })],
+        bio: {
+          value: "asdfsdaf",
+          valid: true,
+          touched: true,
+          validators: [],
         },
         username: {
-          value: "",
-          valid: false,
-          touched: false,
+          value: "asdfsf",
+          valid: true,
+          touched: true,
           validators: [required, length({ min: 3 })],
         },
         email: {
-          value: "",
-          valid: false,
-          touched: false,
+          value: "asdf@asdf.com",
+          valid: true,
+          touched: true,
           validators: [required, email],
         },
         password: {
-          value: "",
-          valid: false,
-          touched: false,
+          value: "karanSingh@12",
+          valid: true,
+          touched: true,
           validators: [required, length({ min: 6 })],
         },
         profilePicture: {
           value: null,
-          valid: false,
+          valid: true,
           touched: false,
           validators: [],
         },
       },
-      formIsValid: false,
+      signupLoading: false,
+      formIsValid: true,
     };
   }
 
@@ -67,9 +71,11 @@ class SignupPage extends Component {
       value: e.target.value,
       valid: isValid,
     };
+
     let formIsValid = true;
     for (const inputId in signupForm)
       formIsValid = formIsValid && signupForm[inputId].valid;
+
     this.setState({ signupForm, formIsValid: formIsValid });
   };
 
@@ -79,6 +85,7 @@ class SignupPage extends Component {
     signupForm.profilePicture.value = e.target.files[0];
     if (checkMimeType(e) && required(e.target.value)) {
       signupForm.profilePicture.valid = true;
+      this.previewFile(signupForm.profilePicture.value);
       this.setState({ signupForm });
     } else {
       signupForm.profilePicture.value = null;
@@ -91,12 +98,24 @@ class SignupPage extends Component {
     }
   };
 
+  previewFile = (file) => {
+    this.setState({ profilePicturePreviewUrl: URL.createObjectURL(file) });
+  };
+
   inputBlurHandler = (e) => {
     const inputId = e.target.id;
     const signupForm = this.state.signupForm;
     signupForm[inputId].touched = true;
     this.setState({ signupForm });
   };
+
+  // skipImageHandler = (e) => {
+  //   const signupForm = this.state.signupForm;
+  //   signupForm["profilePicture"] = {
+  //     ...signupForm["profilePicture"],
+  //     valid: true,
+  //   };
+  // };
 
   render() {
     return (
@@ -106,8 +125,28 @@ class SignupPage extends Component {
         </h3>
         <form
           className="input_form mt-5"
-          onSubmit={(e) => this.props.signupHandler(e, this.state.signupForm)}
+          onSubmit={(e) => {
+            this.setState({ signupLoading: true });
+            this.props.signupHandler(e, this.state.signupForm);
+          }}
         >
+          <Image
+            src={this.state.profilePicturePreviewUrl}
+            alt="profile-picture-preview"
+            classes=""
+            containerClasses=""
+            maxHeight="150px"
+            maxWidth="150px"
+            height="200px"
+            borderRadius="50%"
+            border="4px solid #0000ff41"
+          />
+          {/* <div className="profile-picture-preview">
+            <img
+              src="https://i.ibb.co/r6K6JJn/altophoto-17-10-12-19-02-2018.png"
+              className=""
+            />
+          </div> */}
           <Input
             type="file"
             label="Profile Picture"
@@ -119,33 +158,39 @@ class SignupPage extends Component {
             valid={this.state.signupForm["profilePicture"].valid}
             touched={this.state.signupForm.profilePicture.touched}
           />
+          {/* <Button type="button" classes="" onClick={this.skipImageHandler}>
+            Skip profile Picture
+          </Button> */}
           <Input
             type="text"
-            label="First Name"
-            id="firstName"
+            label="Name"
+            id="name"
+            name="name"
             classes=""
-            value={this.state.signupForm.firstName.value}
-            valid={this.state.signupForm.firstName.valid}
-            touched={this.state.signupForm.firstName.touched}
-            placeholder="first name"
+            value={this.state.signupForm.name.value}
+            valid={this.state.signupForm.name.valid}
+            touched={this.state.signupForm.name.touched}
+            placeholder="Enter Name"
             onBlur={this.inputBlurHandler}
             onChange={this.inputChangeHandler}
           />
-          <Input
-            type="text"
-            label="Last Name"
-            id="lastName"
+          <Textarea
+            label="About you"
+            id="bio"
+            name="bio"
             classes=""
-            value={this.state.signupForm.lastName.value}
-            valid={this.state.signupForm.lastName.valid}
-            touched={this.state.signupForm.lastName.touched}
-            placeholder="last name"
+            rows="5"
+            value={this.state.signupForm.bio.value}
+            valid={this.state.signupForm.bio.valid}
+            touched={this.state.signupForm.bio.touched}
+            placeholder="short intro about you"
             onBlur={this.inputBlurHandler}
             onChange={this.inputChangeHandler}
           />
           <Input
             type="text"
             id="username"
+            name="username"
             classes=""
             label="Username"
             value={this.state.signupForm.username.value}
@@ -161,6 +206,7 @@ class SignupPage extends Component {
             label="Email"
             classes=""
             id="email"
+            name="email"
             placeholder="Enter email"
             value={this.state.signupForm.email.value}
             valid={this.state.signupForm.email.valid}
@@ -173,6 +219,7 @@ class SignupPage extends Component {
             type="password"
             className="form-control"
             id="password"
+            name="password"
             label="Password"
             classes=""
             value={this.state.signupForm.password.value}
@@ -187,6 +234,7 @@ class SignupPage extends Component {
             type="submit"
             classes="btn btn-primary"
             disabled={!this.state.formIsValid ? "disabled" : ""}
+            loading={this.state.signupLoading}
           >
             Sign up
           </Button>

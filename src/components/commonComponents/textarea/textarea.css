@@ -1,0 +1,10 @@
+.form-group .touched.invalid {
+  border: 2px solid #ff00006b !important;
+  background: #ffc2c2;
+}
+
+.form-control:focus,
+.form-control:active {
+  outline: none;
+  border: 2px solid #0000ff6b;
+}

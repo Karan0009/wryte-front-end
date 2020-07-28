@@ -16,6 +16,11 @@ export const email = (value) =>
     value
   );
 
+export const password = (value) =>
+  /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-])/.test(value);
+
+export const number = (value) => !Number.isNaN(Number(value));
+
 export const checkMimeType = (e) => {
   if (!e.target.files[0].name.toLowerCase().match(/\.(jpg|jpeg|png)$/)) {
     return false;

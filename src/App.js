@@ -1,11 +1,10 @@
 import React, { Component, Fragment } from "react";
-import { Switch, Route, Link, Redirect, withRouter } from "react-router-dom";
+import { Switch, Route, withRouter } from "react-router-dom";
 import axios from "axios";
 import "./App.css";
 
 import Nav from "./components/commonComponents/nav/nav";
 import Genres from "./components/genres/genres";
-import Writings from "./components/writings/writings";
 import Alert from "./components/commonComponents/alert/alert";
 
 import WritePage from "./pages/write/write";
@@ -13,6 +12,7 @@ import ProfilePage from "./pages/profile/profile";
 import SingleWritingPage from "./pages/singleWritingPage/singleWritingPage";
 import SignupPage from "./pages/signup/signUp";
 import LoginPage from "./pages/login/login";
+import SingleGenrePage from "./pages/singleGenre/singleGenre";
 
 class App extends Component {
   constructor(props) {
@@ -23,30 +23,44 @@ class App extends Component {
       error: null,
       isAlerted: true,
       alertMessage: "",
-      userId: "1",
-      token: "asdfsadfsdf",
+      userId: "",
+      accessToken: "",
       isAuth: false,
+      authLoading: false,
     };
   }
 
   componentDidMount() {
-    console.log("mounting occurs");
-    fetch("http://localhost:8080/api/genres", {
-      method: "GET",
-    })
-      .then((res) => {
-        if (res.status !== 200) throw new Error("failed to fetch Genres");
-        return res.json();
-      })
-      .then((resData) => {
-        this.setState({ genres: resData.genres });
-      })
-      .catch(this.catchError);
+    this.getGenres();
+    const accessToken = localStorage.getItem("accessToken");
+    const userId = localStorage.getItem("userId");
+    const expiryDate = localStorage.getItem("expiryDate");
+    if (!accessToken || !userId || !expiryDate) return;
+
+    if (new Date(expiryDate) <= new Date()) {
+      this.logoutHandler();
+      return;
+    }
+    const remainingMilliSeconds =
+      new Date(expiryDate).getTime() - new Date().getTime();
+    this.setState({ accessToken, userId, isAuth: true });
+    this.setAutoLogout(remainingMilliSeconds);
   }
 
   catchError = (err) => {
+    console.log(err);
     const error = this.state.error;
     this.setState({ error });
+  };
+
+  getGenres = () => {
+    axios
+      .get("https://wryteapp.herokuapp.com/api/genres")
+      .then((response) => {
+        if (response.status !== 200) throw new Error("failed to fetch Genres");
+        this.setState({ genres: response.data.data.genres });
+      })
+      .catch(this.catchError);
   };
 
   // activeGenreHandler = (name, activeStatus) => {
@@ -77,27 +91,98 @@ class App extends Component {
 
   loginHandler = (e, authData) => {
     e.preventDefault();
-    console.log("you are logged in");
-    this.props.history.push("/");
-    this.setAlertMessage("you are logged in");
-    this.alertMessageHandler();
+    this.setState({ authLoading: true });
+    axios
+      .post(
+        "https://wryteapp.herokuapp.com/api/login",
+        {
+          email: authData.email,
+          password: authData.password,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then((res) => {
+        if (res.status === 422) {
+          throw new Error("Validation failed.");
+        }
+        if (res.status !== 200 && res.status !== 201) {
+          console.log("Error!");
+          throw new Error("Could not authenticate you!");
+        }
+        console.log(res.data);
+        this.setState({
+          accessToken: res.data.data.tokens.accessToken,
+          userId: res.data.data.user._id,
+          isAuth: true,
+          authLoading: false,
+        });
+        localStorage.setItem("accessToken", this.state.accessToken);
+        localStorage.setItem("userId", this.state.userId);
+        //3 hours
+        const remainingMilliSeconds = 3 * 60 * 60 * 1000;
+        const expiryDate = new Date(
+          new Date().getTime() + remainingMilliSeconds
+        );
+        localStorage.setItem("expiryDate", expiryDate.toISOString());
+        this.setAutoLogout(remainingMilliSeconds);
+        console.log(res.data);
+        this.props.history.push("/");
+        this.setAlertMessage("you are logged in");
+        this.alertMessageHandler();
+      })
+      .catch((err) => {
+        console.log(err);
+        this.setState({
+          isAuth: false,
+          token: null,
+          userId: null,
+          authLoading: false,
+          error: err,
+        });
+        this.setAlertMessage("wrong credentials");
+        this.alertMessageHandler();
+      });
+  };
+
+  logoutHandler = () => {
+    console.log("user logged out");
+    this.setState({
+      token: null,
+      userId: null,
+      isAuth: false,
+    });
+    localStorage.removeItem("accessToken");
+    // localStorage.removeItem("expiryDate");
+    localStorage.removeItem("userId");
+  };
+
+  setAutoLogout = (mS) => {
+    setTimeout(() => {
+      this.logoutHandler();
+    }, mS);
   };
 
   signupHandler = (e, authData) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("profilePicture", authData.profilePicture.value);
-    formData.append("firstName", authData.firstName.value);
-    formData.append("lastName", authData.lastName.value);
+    formData.append("name", authData.name.value);
+    formData.append("bio", authData.bio.value);
     formData.append("username", authData.username.value);
     formData.append("email", authData.email.value);
     formData.append("password", authData.password.value);
-    console.log(authData);
+    console.log(authData.password.value);
     axios
-      .post("http://localhost:8080/api/signup", formData)
+      .post("https://wryteapp.herokuapp.com/api/signup", formData)
       .then((res) => {
-        // console.log(res);
         console.log(res.data);
+        this.setAlertMessage("now login");
+        this.alertMessageHandler();
+        this.props.history.replace("/login");
       })
       .catch(this.catchError);
     // console.log("new user created");
@@ -106,16 +191,13 @@ class App extends Component {
     // this.alertMessageHandler();
   };
 
-  redirectToLogin = () => {
-    this.props.history.replace("/login");
-  };
-
   render() {
     return (
       <Fragment>
         <Nav appName={this.state.appName} isAuth={this.state.isAuth} />
         {!this.state.isAlerted && (
           <Alert
+            error={this.state.error}
             alertMessage={this.state.alertMessage}
             alertMessageHandler={this.alertMessageHandler}
           />
@@ -133,7 +215,6 @@ class App extends Component {
               <WritePage
                 {...props}
                 isAuth={this.state.isAuth}
-                redirectToLogin={this.redirectToLogin}
                 genres={this.state.genres}
                 setAlertMessage={this.setAlertMessage}
                 alertMessageHandler={this.alertMessageHandler}
@@ -144,7 +225,11 @@ class App extends Component {
             exact
             path="/login"
             render={(props) => (
-              <LoginPage {...props} loginHandler={this.loginHandler} />
+              <LoginPage
+                {...props}
+                authLoading={this.state.authLoading}
+                loginHandler={this.loginHandler}
+              />
             )}
           />
           <Route
@@ -154,7 +239,11 @@ class App extends Component {
               <SignupPage {...props} signupHandler={this.signupHandler} />
             )}
           />
-          <Route exact path="/profile" component={ProfilePage} />
+          <Route
+            exact
+            path="/profile"
+            render={(props) => <ProfilePage {...props} />}
+          />
           <Route
             exact
             path="/"
@@ -178,7 +267,9 @@ class App extends Component {
           <Route
             exact
             path="/:genreId"
-            render={(props) => <Writings {...props} />}
+            render={(props) => (
+              <SingleGenrePage {...props} genres={this.state.genres} />
+            )}
           />
         </Switch>
       </Fragment>

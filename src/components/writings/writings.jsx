@@ -1,66 +1,42 @@
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 
 import Writing from "../writingCard/writing";
 import "./writings.css";
 
 class Writings extends Component {
-  state = {
-    writings: [
-      {
-        _id: "1",
-        title: "title1",
-        text:
-          "ldsf;kgjlsa;jfsdl;fjsdl;fjdslafhsdalhfglksjglsda;jfds;ljflsd;jfsda;fjsda;lfkjsd",
-      },
-      {
-        _id: "2",
-        title: "title1",
-        text: "ldsf;kgjlsa;jfsdl;fjsdl",
-      },
-      {
-        _id: "13",
-        title: "title1",
-        text:
-          "ldsf;kgjlsa;jfsdl;fjsdl;fjdslafhsdalhfgll;fjsdl;fjdslafhsdalhfglksjglsdal;fjsdl;fjdslafhsdalhfglksjglsdal;fjsdl;fjdslafhsdalhfglksjglsdal;fjsdl;fjdslafhsdalhfglksjglsdal;fjsdl;fjdslafhsdalhfglksjglsdal;fjsdl;fjdslafhsdalhfglksjglsdal;fjsdl;fjdslafhsdalhfglksjglsdaksjglsda;jfds;ljflsd;jfsda;fjsda;lfkjsd",
-      },
-      {
-        _id: "45",
-        title: "title1",
-        text: "ldsf;kgjlsa;jfsdl;fjsdl",
-      },
-      {
-        _id: "25",
-        title: "title1",
-        text: "ldsf;kgjlsa;jfsdl;fjsdl",
-      },
-      {
-        _id: "245",
-        title: "title1",
-        text: "ldsf;kgjlsa;jfsdl;fjsdl",
-      },
-      {
-        _id: "2456",
-        title: "title1",
-        text: "ldsf;kgjlsa;jfsdl;fjsdl",
-      },
-      {
-        _id: "462",
-        title: "title1",
-        text: "ldsf;kgjlsa;jfsdl;fjsdl",
-      },
-    ],
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      writings: this.props.writings,
+    };
+  }
   render() {
+    if (this.props.writings) {
+      if (this.props.writings.length === 0)
+        return (
+          <div className="writings_div">
+            <h4
+              style={{
+                margin: "auto",
+                textAlign: "center",
+                padding: "50px",
+                textTransform: "uppercase",
+              }}
+            >
+              so empty here :/
+            </h4>
+          </div>
+        );
+    }
     return (
       <div className="writings_div">
-        {this.state.writings.map((writing) => (
-          <Writing
-            key={writing._id}
-            _id={writing._id}
-            title={writing.title}
-            text={writing.text}
-          />
-        ))}
+        {this.props.writings ? (
+          this.props.writings.map((writing) => (
+            <Writing key={writing._id} writing={writing} />
+          ))
+        ) : (
+          <div></div>
+        )}
       </div>
     );
   }

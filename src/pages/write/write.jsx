@@ -1,55 +1,90 @@
 import React, { Component, Fragment } from "react";
 import { Redirect } from "react-router-dom";
+import axios from "axios";
 import "./write.css";
 
-import Alert from "../../components/commonComponents/alert/alert";
+import { required, length } from "../../utils/validators";
 import Input from "../../components/commonComponents/input/input";
+import Textarea from "../../components/commonComponents/textarea/textarea";
 import Button from "../../components/commonComponents/Button/Button";
 
 class WritePage extends Component {
   constructor(props) {
     super(props);
-    if (!this.props.isAuth) this.props.redirectToLogin();
     this.state = {
       genres: [],
       error: null,
-      tags: "",
-      writing: {
-        title: "",
-        genre: "",
-        content: "",
-        tags: [],
+      writeForm: {
+        title: {
+          value: "",
+          valid: false,
+          touched: false,
+          validators: [required, length({ max: 30 })],
+        },
+        genre: {
+          value: "fiction",
+          valid: false,
+          touched: false,
+          validators: [required],
+        },
+        content: {
+          value: "",
+          valid: false,
+          touched: false,
+          validators: [required, length({ min: 5 })],
+        },
+        tags: {
+          value: "",
+          valid: false,
+          touched: false,
+          validators: [required],
+        },
       },
+      redirectToProfile: false,
+      formIsValid: false,
     };
   }
 
   componentDidMount() {
-    fetch("http://localhost:8080/api/genres", {
-      method: "GET",
-    })
-      .then((res) => {
-        if (res.status !== 200) throw new Error("failed to fetch Genres");
-        return res.json();
-      })
-      .then((resData) => {
-        this.setState({ genres: resData.genres });
+    const writeForm = this.state.writeForm;
+    axios
+      .get("https://wryteapp.herokuapp.com/api/genres")
+      .then((response) => {
+        if (response.status !== 200) throw new Error("failed to fetch Genres");
+        writeForm["genre"] = {
+          ...writeForm["genre"],
+          value: response.data.data.genres[0].name,
+        };
+        this.setState({ genres: response.data.data.genres, writeForm });
       })
       .catch(this.catchError);
   }
 
-  inputChangeHandler = (event) => {
-    let writing = this.state.writing;
-    let tags = this.state.tags;
-    if (event.target.id === "title") {
-      writing.title = event.target.value;
-    } else if (event.target.id === "writing-content") {
-      writing.content = event.target.value;
-    } else if (event.target.id === "genre") {
-      writing.genre = event.target.value;
-    } else if (event.target.id === "tags") {
-      tags = event.target.value;
-    }
-    this.setState({ writing, tags });
+  inputChangeHandler = (e) => {
+    const writeForm = this.state.writeForm;
+    let isValid = true;
+    if (writeForm[e.target.id].validators.length > 0)
+      for (const validator of writeForm[e.target.id].validators) {
+        isValid = isValid && validator(e.target.value);
+      }
+    writeForm[e.target.id] = {
+      ...writeForm[e.target.id],
+      value: e.target.value,
+      valid: isValid,
+    };
+
+    let formIsValid = true;
+    for (const inputId in writeForm)
+      formIsValid = formIsValid && writeForm[inputId].valid;
+
+    this.setState({ writeForm, formIsValid: formIsValid });
+  };
+
+  inputBlurHandler = (e) => {
+    const inputId = e.target.id;
+    const writeForm = this.state.writeForm;
+    writeForm[inputId].touched = true;
+    this.setState({ writeForm });
   };
 
   handleTagsInput = (event) => {
@@ -87,62 +122,34 @@ class WritePage extends Component {
     this.setState({ writing, tag });
   };
 
-  // handleOptionClick = (event) => {
-  //   let writing = this.state.writing;
-  //   if (event.target.value !== "" || event.target.value !== undefined) {
-  //     if (
-  //       writing.genres.find((genre) => genre === event.target.value) ==
-  //       undefined
-  //     ) {
-  //       writing.genres.push(event.target.value);
-  //     } else {
-  //       writing.genres = writing.genres.filter((genre) => {
-  //         if (genre !== event.target.value) return genre;
-  //       });
-  //     }
-  //     this.setState({ writing });
-  //   }
-  // };
-
   publishWritingHandler = (event) => {
     event.preventDefault();
-    let tags = this.state.tags;
-    let writing = this.state.writing;
-    writing.tags = tags.trim().split(" ");
-    console.log(this.state.writing);
-    this.setState({
-      writing: { title: "", genre: "", content: "", tags: [] },
-      tags: "",
-    });
-    this.props.setAlertMessage("published successfully");
-    this.props.alertMessageHandler();
+    let writeForm = this.state.writeForm;
 
-    // fetch("http://localhost:8080/write", {
-    //   method: "POST",
-    //   headers: { "content-type": "application/json" },
-    //   body: JSON.stringify({
-    //     title: this.state.writing.title,
-    //     category: this.state.writing.category,
-    //     genres: this.state.writing.genres,
-    //     content: this.state.writing.content
-    //   })
-    // })
-    //   .then(res => {
-    //     if (res.status !== 200 && res.status !== 201) {
-    //       throw new Error("Can't publish");
-    //     }
-    //     return res.json();
-    //   })
-    //   .then(resData => {
-    //     this.props.setAlertMessage("writing published successful!!");
-    //     this.props.alertMessageHandler();
-    //     console.log(resData);
-    //     this.setState({
-    //       writing: { title: "", category: "", content: "", genres: [] },
-    //       genres: ""
-    //     });
-    //   })
-    //   .catch(this.catchError);
+    const accessToken = localStorage.getItem("accessToken");
+    axios
+      .post(
+        "https://wryteapp.herokuapp.com/api/user/writing/create",
+        {
+          title: writeForm.title.value,
+          genre: writeForm.genre.value,
+          tags: writeForm.tags.value,
+          content: writeForm.content.value,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      )
+      .then((res) => {
+        if (res.status !== 201) throw new Error("publishing error");
+        this.props.setAlertMessage("published successfully");
+        this.props.alertMessageHandler();
+        this.setState({ formIsValid: false, redirectToProfile: true });
+      })
+      .catch(this.catchError);
   };
 
   catchError = (error) => {
@@ -151,10 +158,13 @@ class WritePage extends Component {
   };
 
   render() {
+    if (!localStorage.getItem("accessToken") && !this.props.isAuth)
+      return <Redirect to="/login" />;
+    if (this.state.redirectToProfile) return <Redirect to="/profile" />;
     return (
       <Fragment>
         <div className="container writeForm_div">
-          <form onSubmit={(e) => this.publishWritingHandler(e)}>
+          <form onSubmit={this.publishWritingHandler}>
             <Input
               type="text"
               label="Title"
@@ -162,8 +172,11 @@ class WritePage extends Component {
               classes="write-title"
               placeholder="Write title here"
               min="1"
-              value={this.state.writing.title}
-              onChange={(e) => this.inputChangeHandler(e)}
+              value={this.state.writeForm.title.value}
+              valid={this.state.writeForm.title.valid}
+              touched={this.state.writeForm.title.touched}
+              onChange={this.inputChangeHandler}
+              onBlur={this.inputBlurHandler}
             />
             <Input
               type="select"
@@ -173,81 +186,45 @@ class WritePage extends Component {
               classes="write-genre"
               placeholder="Select Genre"
               min="1"
-              value={this.state.writing.genre}
-              onClick={(e) => this.inputChangeHandler(e)}
+              value={this.state.writeForm.genre.value}
+              valid={this.state.writeForm.genre.valid}
+              touched={this.state.writeForm.genre.touched}
+              onClick={this.inputChangeHandler}
+              onBlur={this.inputBlurHandler}
             />
             <Input
               type="text"
               label="Tags"
               id="tags"
               classes="write-tags"
-              value={this.state.tags}
+              value={this.state.writeForm.tags.value}
+              valid={this.state.writeForm.tags.valid}
+              touched={this.state.writeForm.tags.touched}
               placeholder="Write tags here separated by spaces"
-              onChange={(e) => this.inputChangeHandler(e)}
+              onChange={this.inputChangeHandler}
+              onBlur={this.inputBlurHandler}
             />
-            <Input
-              type="textarea"
-              id="writing-content"
+            <Textarea
+              id="content"
+              rows="7"
               classes="write-content"
               placeholder="Write your story here"
-              value={this.state.writing.content}
-              onChange={(e) => this.inputChangeHandler(e)}
+              value={this.state.writeForm.content.value}
+              valid={this.state.writeForm.content.valid}
+              touched={this.state.writeForm.content.touched}
+              onChange={this.inputChangeHandler}
+              onBlur={this.inputBlurHandler}
             />
             <div className="form-group">
               <Button
                 link=""
                 type="submit"
                 classes="btn btn-primary"
-                onClick={(e) => this.publishWritingHandler(e)}
+                disabled={this.state.formIsValid ? "" : "disabled"}
               >
                 Publish
               </Button>
             </div>
-            {/* <div class="form-group">
-              <label for="title">Title</label>
-              <input
-                type="text"
-                class="form-control"
-                id="title"
-                value={this.state.writing.title}
-                onChange={(e) => this.inputChangeHandler(e)}
-                placeholder="Some Title"
-              />
-            </div>
-            <div class="form-group">
-              <label for="genres">Select max 5 genres</label>
-              <select
-                multiple={true}
-                class="form-control"
-                value={this.state.writing.genres}
-                onChange={(e) => this.inputChangeHandler(e)}
-                id="genres"
-              >
-                {this.state.categories.map((category) => (
-                  <option
-                    key={category.name}
-                    onClick={(e) => this.handleOptionClick(e)}
-                  >
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="writtenContent">Type your content here</label>
-              <textarea
-                class="form-control"
-                id="writtenContent"
-                value={this.state.writing.content}
-                onChange={(e) => this.inputChangeHandler(e)}
-                rows="4"
-              ></textarea>
-            </div>
-            <div className="form-group"> 
-              <button type="submit" className="btn btn-primary">
-                Publish
-              </button>
-            </div>*/}
           </form>
         </div>
       </Fragment>

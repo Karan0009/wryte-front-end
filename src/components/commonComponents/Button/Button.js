@@ -10,6 +10,7 @@ const button = (props) =>
         `button--${props.design}`,
         `button--${props.mode}`,
         `${props.classes}`,
+        props.loading ? "button_loading" : "",
       ].join(" ")}
       onClick={props.onClick}
       disabled={props.disabled || props.loading}
@@ -18,7 +19,7 @@ const button = (props) =>
       {props.loading ? "Loading..." : props.children}
     </button>
   ) : (
-    <Link className={[`${props.classes}`].join(" ")} to={props.link}>
+    <Link className={props.classes} to={props.link}>
       {props.children}
     </Link>
   );

@@ -1,4 +1,4 @@
-import React, { Component, Fragment, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 // import OwlCarousel from "react-owl-carousel";
 // import "owl.carousel/dist/assets/owl.carousel.css";
 // import "owl.carousel/dist/assets/owl.theme.default.css";
@@ -33,13 +33,10 @@ function SamplePrevArrow(props) {
 
 const Genres = (props) => {
   const [genres, setGenres] = useState(props.genres);
-  const [error, setError] = useState(null);
-
-  const catchError = (error) => setError(error);
 
   useEffect(() => {
     setGenres(props.genres);
-  });
+  }, [props.genres]);
 
   // useEffect(() => {
   // setCategories(props.categories);
@@ -55,10 +52,6 @@ const Genres = (props) => {
   //   })
   //   .catch(catchError);
   // }, []);
-
-  useEffect(() => {
-    console.log(genres);
-  });
 
   let settings = {
     slidesToShow: 4,

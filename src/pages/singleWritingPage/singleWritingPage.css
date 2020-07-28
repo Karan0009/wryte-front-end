@@ -7,7 +7,14 @@
   display: flex;
   flex-direction: column;
   margin-top: 20px;
+  border-radius: 0.25rem;
+  padding: 1em;
+}
+
+.container-div {
   background: #ebebeb;
+  margin-top: 20px;
+  margin-bottom: 20px;
   border-radius: 0.25rem;
   padding: 1em;
   box-shadow: 0px 6px 30px 1px #c4c4c4a6;
@@ -26,9 +33,8 @@
   overflow: hidden;
   margin: auto;
   background-color: yellow;
-  background-position: center;
-  background-size: contain;
-  background-repeat: no-repeat;
+  border-radius: 50%;
+  height: 100px;
 }
 .author-profle-picture__image {
   max-width: 100%;
@@ -64,6 +70,20 @@
   margin-top: 10px;
   padding: 15px;
   background: white;
+  height: 300px;
+  overflow-y: scroll;
   border-radius: 0.25rem;
   word-wrap: break-word;
+}
+
+.writing_comments_section {
+  display: grid;
+  grid-template-columns: auto;
+}
+
+.writing_comments {
+  display: grid;
+  grid-template-columns: auto;
+  /* max-height: 400px;
+  overflow-y: scroll; */
 }

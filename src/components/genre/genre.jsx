@@ -1,10 +1,10 @@
-import React, { Component, useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 import "./genre.css";
 
 const Genre = (props) => {
-  const [name, setName] = useState(props.genreName);
+  const [name] = useState(props.genreName);
   // const [active, setActive] = useState(false);
 
   // useEffect(() => {

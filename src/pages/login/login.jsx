@@ -3,33 +3,56 @@ import "./login.css";
 
 import Input from "../../components/commonComponents/input/input";
 import Button from "../../components/commonComponents/Button/Button";
+import { required, length, email } from "../../utils/validators";
 
 class LoginPage extends Component {
-  state = {
-    user: {
-      email: "",
-      password: "",
-    },
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      loginForm: {
+        email: {
+          value: "",
+          valid: false,
+          touched: false,
+          validators: [required, email],
+        },
+        password: {
+          value: "",
+          valid: false,
+          touched: false,
+          validators: [required, length({ min: 6 })],
+        },
+      },
+      formIsValid: false,
+    };
+  }
 
   inputChangeHandler = (e) => {
-    let user = this.state.user;
-    let targetId = e.target.id;
-    if (targetId === "email") user.email = e.target.value;
-    else if (targetId === "password") user.password = e.target.value;
+    const loginForm = this.state.loginForm;
+    let isValid = true;
+    if (loginForm[e.target.id].validators.length > 0)
+      for (const validator of loginForm[e.target.id].validators) {
+        isValid = isValid && validator(e.target.value);
+      }
+    loginForm[e.target.id] = {
+      ...loginForm[e.target.id],
+      value: e.target.value,
+      valid: isValid,
+    };
 
-    this.setState({ user });
+    let formIsValid = true;
+    for (const inputId in loginForm)
+      formIsValid = formIsValid && loginForm[inputId].valid;
+
+    this.setState({ loginForm, formIsValid: formIsValid });
   };
 
-  // handleLogin = (e) => {
-
-  //   this.setState({
-  //     user: {
-  //       email: "",
-  //       password: "",
-  //     },
-  //   });
-  // };
+  inputBlurHandler = (e) => {
+    const inputId = e.target.id;
+    const loginForm = this.state.loginForm;
+    loginForm[inputId].touched = true;
+    this.setState({ loginForm });
+  };
 
   render() {
     return (
@@ -39,27 +62,47 @@ class LoginPage extends Component {
         </h3>
         <form
           className="input_form mt-5"
-          onSubmit={(e) => this.props.loginHandler(e, this.state.user)}
+          onSubmit={(e) =>
+            this.props.loginHandler(e, {
+              email: this.state.loginForm.email.value,
+              password: this.state.loginForm.password.value,
+            })
+          }
         >
           <Input
             type="email"
             label="Email"
+            classes=""
             id="email"
+            name="email"
             placeholder="Enter email"
-            value={this.state.user.email}
-            onChange={(e) => this.inputChangeHandler(e)}
+            value={this.state.loginForm.email.value}
+            valid={this.state.loginForm.email.valid}
+            touched={this.state.loginForm.email.touched}
+            onBlur={this.inputBlurHandler}
+            onChange={this.inputChangeHandler}
           />
           <Input
             type="password"
             className="form-control"
             id="password"
+            name="password"
             label="Password"
-            value={this.state.user.password}
+            classes=""
+            value={this.state.loginForm.password.value}
+            valid={this.state.loginForm.password.valid}
+            touched={this.state.loginForm.password.touched}
             placeholder="Password"
-            onChange={(e) => this.inputChangeHandler(e)}
+            onBlur={this.inputBlurHandler}
+            onChange={this.inputChangeHandler}
           />
-          <Button type="submit" classes="btn btn-primary">
-            Log in
+          <Button
+            type="submit"
+            classes="btn btn-primary"
+            loading={this.props.authLoading}
+            disabled={!this.state.formIsValid ? "disabled" : ""}
+          >
+            Login
           </Button>
           <br />
           <Button link="/signup" classes="signin-link">

@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 
 import "./input.css";
 
@@ -6,7 +6,7 @@ const Input = (props) => {
   if (props.type === "select") {
     return (
       <div className="form-group">
-        {props.label || <label htmlFor={props.id}>{props.label}</label>}
+        {props.label && <label htmlFor={props.id}>{props.label}</label>}
         <select
           className={
             props.valid
@@ -15,7 +15,9 @@ const Input = (props) => {
           }
           onChange={props.onChange}
           name={props.name}
+          id={props.id}
           onClick={props.onClick}
+          onBlur={props.onBlur}
         >
           {props.options.map((genre) => (
             <option key={genre._id} id={props.id}>
@@ -25,28 +27,10 @@ const Input = (props) => {
         </select>
       </div>
     );
-  } else if (props.type === "textarea") {
-    return (
-      <div className="form-group">
-        {props.label || <label htmlFor={props.id}>{props.label}</label>}
-        <textarea
-          className={
-            props.valid
-              ? [`${props.classes}`, `form-control`].join(" ")
-              : [`${props.classes}`, "form-control", "input-error"].join(" ")
-          }
-          placeholder={props.placeholder}
-          onChange={props.onChange}
-          name={props.name}
-          id={props.id}
-          value={props.value}
-        />
-      </div>
-    );
   } else {
     return (
       <div className="form-group">
-        {props.label || <label htmlFor={props.id}>{props.label}</label>}
+        {props.label && <label htmlFor={props.id}>{props.label}</label>}
         <input
           type={props.type}
           className={[
