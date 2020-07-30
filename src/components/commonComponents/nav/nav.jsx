@@ -31,7 +31,7 @@ class Nav extends Component {
         <Button link="/" classes="navbar-brand col-4">
           {this.props.appName}
         </Button>
-        <div className="search-container col-5">
+        <div className="search-container col-3">
           <form className="nav-search-form">
             <input
               type="text"
@@ -48,6 +48,16 @@ class Nav extends Component {
             </Button>
           </form>
         </div>
+        {this.props.urlOfPage.includes("profile") && (
+          <Button
+            onClick={() => {
+              this.props.logoutHandler();
+            }}
+            classes="btn btn-danger btn_profile col-1"
+          >
+            Logout
+          </Button>
+        )}
         <Button
           link={this.profileHandler().link}
           classes="btn btn-secondary btn_profile col-1"

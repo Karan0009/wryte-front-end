@@ -13,6 +13,7 @@ import SingleWritingPage from "./pages/singleWritingPage/singleWritingPage";
 import SignupPage from "./pages/signup/signUp";
 import LoginPage from "./pages/login/login";
 import SingleGenrePage from "./pages/singleGenre/singleGenre";
+import EditProfilePage from "./pages/editProfile/editProfile";
 
 class App extends Component {
   constructor(props) {
@@ -27,6 +28,7 @@ class App extends Component {
       accessToken: "",
       isAuth: false,
       authLoading: false,
+      urlOfPage: "",
     };
   }
 
@@ -43,8 +45,20 @@ class App extends Component {
     }
     const remainingMilliSeconds =
       new Date(expiryDate).getTime() - new Date().getTime();
-    this.setState({ accessToken, userId, isAuth: true });
+    this.setState({
+      accessToken,
+      userId,
+      isAuth: true,
+      urlOfPage: window.location.href,
+    });
     this.setAutoLogout(remainingMilliSeconds);
+  }
+
+  componentDidUpdate() {
+    if (window.location.href !== this.state.urlOfPage) {
+      console.log(window.location.href);
+      this.setState({ urlOfPage: window.location.href });
+    }
   }
 
   catchError = (err) => {
@@ -185,16 +199,18 @@ class App extends Component {
         this.props.history.replace("/login");
       })
       .catch(this.catchError);
-    // console.log("new user created");
-    // this.props.history.push("/login");
-    // this.setAlertMessage("you are signed up");
-    // this.alertMessageHandler();
   };
 
   render() {
     return (
       <Fragment>
-        <Nav appName={this.state.appName} isAuth={this.state.isAuth} />
+        <Nav
+          {...this.props}
+          appName={this.state.appName}
+          isAuth={this.state.isAuth}
+          urlOfPage={this.state.urlOfPage}
+          logoutHandler={this.logoutHandler}
+        />
         {!this.state.isAlerted && (
           <Alert
             error={this.state.error}
@@ -246,13 +262,14 @@ class App extends Component {
           />
           <Route
             exact
+            path="/edit-profile"
+            render={(props) => <EditProfilePage {...props} />}
+          />
+          <Route
+            exact
             path="/"
             render={() => <Genres genres={this.state.genres} />}
           />
-          {/* <Genres
-              activeGenreHandler={this.activeGenreHandler}
-              genres={this.state.genres}
-            /> */}
           <Route
             exact
             path="/w/:writingId"
