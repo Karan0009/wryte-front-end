@@ -62,6 +62,9 @@ class SingleWritingPage extends Component {
     let likeCount = this.state.likeCount;
     let isLiked = this.state.isLiked;
     const accessToken = localStorage.getItem("accessToken");
+    if (!accessToken) {
+      this.setState({ redirectToLogin: true });
+    }
     if (!isLiked && likeCount >= 0) {
       likeCount += 1;
       this.setState({ likeCount, isLiked: !isLiked });
