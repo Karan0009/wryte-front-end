@@ -23,7 +23,7 @@ class WritePage extends Component {
         },
         genre: {
           value: "fiction",
-          valid: false,
+          valid: true,
           touched: false,
           validators: [required],
         },
